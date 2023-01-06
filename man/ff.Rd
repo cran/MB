@@ -13,9 +13,9 @@ ff(dt,m,w,n,q1)
 
 \item{w}{the number of predicted values}
 
-\item{n}{gg}
+\item{n}{number of values}
 
-\item{q1}{independent time series values}
+\item{q1}{matrix independent time series values #In the case of m=2, enter the independent string values as follows(matrix(c())),In the case of m=3, enter the independent string values as follows(matrix(c(),w,m-1,byrow=T))}
 }
 \value{
 the output from \code{ff()}

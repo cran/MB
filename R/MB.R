@@ -5,8 +5,8 @@
 #' @param dt data frame
 #' @param m the number of time series
 #' @param w the number of predicted values
-#' @param q1 independent time series values
-#' @param n gg
+#' @param q1 matrix independent time series values #In the case of m=2, enter the independent string values as follows(matrix(c())),In the case of m=3, enter the independent string values as follows(matrix(c(),w,m-1,byrow=T))
+#' @param n number of values
 #' @usage ff(dt,m,w,n,q1)
 #' @examples
 #' x=rnorm(17,10,1)
@@ -21,7 +21,7 @@
 ff=function(dt,m,w,n,q1)
     { qq=list(Number_of_categories= ceiling (2.5*(n^(0.25))),mx=matrix(nrow=m,ncol=1),mn= matrix(nrow=m,ncol=1),rn= matrix(nrow=m,ncol=1),l= matrix(nrow=m,ncol=1)
        ,xd=matrix(nrow=ceiling (2.5*(n^(0.25))),ncol=m),xu= matrix(nrow=ceiling (2.5*(n^(0.25))),ncol=m),xx=matrix(nrow=ceiling (2.5*(n^(0.25))),ncol=m),r=matrix(nrow=ceiling (2.5*(n^(0.25))),ncol=ceiling (2.5*(n^(0.25)))^(m-1)),
-         rr=matrix(nrow=1,ncol=ceiling (2.5*(n^(0.25)))^(m-1)),rr3=matrix(nrow=1,ncol=ceiling (2.5*(n^(0.25)))^(m-1)),predicted_values=matrix(ncol=w))
+         rr=matrix(nrow=1,ncol=ceiling (2.5*(n^(0.25)))^(m-1)),rr3=matrix(nrow=1,ncol=ceiling (2.5*(n^(0.25)))^(m-1)),predicted_values=matrix(nrow = w,ncol = 1))
 
   n=nrow(dt)
   if (is.null(n) || is.na(n) || is.infinite(n)) {
@@ -52,7 +52,7 @@ ff=function(dt,m,w,n,q1)
       return(NULL)
     }
   )
-  w = tryCatch(
+w = tryCatch(
     {
       as.integer(w)
     },
@@ -62,7 +62,7 @@ ff=function(dt,m,w,n,q1)
       message(paste(warning_msg, "\n"))
       return(NULL)
     }
-  )
+    )
 
   nameMsg = "Number of categories format not supported! "
 
@@ -140,30 +140,29 @@ ff=function(dt,m,w,n,q1)
       if (is.null(qq$rr3[i]) || is.na(qq$rr3[i]) || is.infinite(qq$rr3[i])) {
         stop(terminatepg)
       }
-      #q1=list(q=matrix(c(scan(,,quiet=TRUE)),w,m-1))
       for(i in 1:w)
-      {y=0
+      {
+      y=0
       sss=0
       for(s in 1:qq$Number_of_categories)
       {
         sss=sss+1
-        if(q1$q[i]>=qq$xd[s,1] & q1$q[i]<qq$xu[s,1])
+        if(q1[i]>=qq$xd[s,1] & q1[i]<qq$xu[s,1])
         {if(qq$rr[sss]!=0)
         {
           y=y+(qq$r[,sss]*(qq$xx[,2]))/qq$rr[sss]}
           else
           {for(sss in 1:qq$Number_of_categories)
             y=y+(qq$rr3[sss]*(qq$xx[sss,2]))}}
-        qq$predicted_values=sum(y)
-      }
-      return(qq)
-      if (is.null(qq$predicted_values) || is.na(qq$predicted_values) || is.infinite(qq$predicted_values)) {
-        stop(terminatepg)
+        qq$predicted_values[i]=sum(y)
       }}
-}
+      return(qq)
+      if (is.null(qq$predicted_values[i]) || is.na(qq$predicted_values[i]) || is.infinite(qq$predicted_values[i])) {
+        stop(terminatepg)
+
+}}
   else
     {
- q22=list(q=matrix(c(scan("",quiet=TRUE)),w,m-1,byrow = T))
 
       sss=0
       for(i in 1:qq$Number_of_categories)
@@ -196,9 +195,9 @@ ff=function(dt,m,w,n,q1)
           for(h in 1:qq$Number_of_categories)
           {
             sss=sss+1
-            if(q22$q[i,1]>=qq$xd[s,1] & q22$q[i,1]<qq$xu[s,1])
+            if(q1[i,1]>=qq$xd[s,1] & q1[i,1]<qq$xu[s,1])
             {
-              if(q22$q[i,2]>=qq$xd[h,2] & q22$q[i,2]<qq$xu[h,2])
+              if(q1[i,2]>=qq$xd[h,2] & q1[i,2]<qq$xu[h,2])
               {
                 if(qq$rr[sss]!=0)
                 {
@@ -206,7 +205,9 @@ ff=function(dt,m,w,n,q1)
                 else
                 {for(sss in 1:qq$Number_of_categories)
                   y=y+(qq$rr3[sss]*qq$xx[sss,3])}}
-              qq$predicted_values=sum(y)
-            }}}
+              qq$predicted_values[i]=sum(y)
+            }}}}
         return(qq)
-        }}}
+        if (is.null(qq$predicted_values[i]) || is.na(qq$predicted_values[i]) || is.infinite(qq$predicted_values[i])) {
+          stop(terminatepg)}
+        }}
